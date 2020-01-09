@@ -1,0 +1,66 @@
+﻿
+<link rel="stylesheet" href="https://jqueryvalidation.org/files/demo/site-demos.css">
+
+
+<form id="myform">
+    <div class="row">
+        <div class="col-md-4"><label for="name">Name   </label></div>
+        <div class="col-md-8"><input type="text" id="name" name="name"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4"><label for="word">Number </label></div>
+        <div class="col-md-8"><input type="text" id="word" name="word"></div>
+    </div>
+    <div class="row">
+        <button type="button">Validate!</button>
+    </div>
+</form>
+<div class="row">
+    <div id="divSuccess" style="display:none;"> here details</div>
+</div>
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
+<script>
+    // just for the demos, avoids form submit
+    $.validator.setDefaults({
+        debug: true,
+        success: "valid"
+    });
+    $.validator.addMethod("maxnumber", function (value, element) {
+        return Number(value) < 1000;
+    }, "Number should be less than 1000");
+    $.validator.addMethod("maxPrecision", function (value, element) {
+        return value.substring(value.indexOf('.') + 1, value.length).length < 4;
+    }, "Precision should not exceed 3 digit");
+
+    $("#myform").validate({
+        rules: {
+            name: {
+                required: true
+            },
+            word: {
+                required: true,
+                number: true,
+                maxnumber: true,
+                maxPrecision: true
+            }
+        }
+    });
+    var form = $("#myform");
+
+    $("button").click(function () {
+        if (form.valid()) {
+            let id = $('#word').val();
+            $.get("http://localhost:51056/wordvalue/" + id + '/', function (data) {
+                $('#divSuccess').css('display', 'block');
+                let textValue = $('#name').val() + ' has ' + data;
+                $('#divSuccess').html(textValue);
+            });
+
+        }
+        else
+            $('#divSuccess').css('display', 'none');
+    });
+</script>
